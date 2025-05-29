@@ -1,0 +1,20 @@
+components:
+  - 'src/components/**/*'
+
+context:
+  - 'src/context/**/*'
+
+hooks:
+  - 'src/hooks/**/*'
+
+pages:
+  - 'src/pages/**/*'
+
+utils:
+  - 'src/utils/**/*'
+
+tests:
+  - 'src/tests/**/*'
+
+frontend:
+  - 'src/**/*'
