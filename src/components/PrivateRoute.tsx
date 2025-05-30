@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import magic from "@/lib/magic";
 import { Loader2 } from "lucide-react";
 
-export default function PrivateRoute({ children }) {
+export default function PrivateRoute({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<boolean | null>(null);
 
   console.log("PrivateRoute mounted");
