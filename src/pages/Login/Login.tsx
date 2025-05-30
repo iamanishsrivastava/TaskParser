@@ -15,7 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
+
+import Features from "@/components/Landing/Features";
 
 const formSchema = z.object({
   email: z
@@ -50,7 +52,6 @@ export default function Login() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const cleanEmail = values.email.trim();
-    console.log("Email", cleanEmail);
     setLoading(true);
     try {
       await magic.auth.loginWithMagicLink({
@@ -76,38 +77,58 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
-      <Form {...form}>
-        <form
-          className="flex flex-col justify-center gap-3 w-100 h-100"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div className="grid grid-cols-1 md:grid-cols-2 h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100">
+      {/* Left Feature Showcase */}
+      <div className="hidden md:block overflow-y-auto">
+        <Features />
+      </div>
 
-          <Button className="mt-4" type="submit" disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              "Send Me a Magic Link"
-            )}
-          </Button>
-          {message}
-        </form>
-      </Form>
+      {/* Right Login Form */}
+      <div className="flex items-center justify-center p-8 bg-gradient-to-tr from-green-100 via-pink-50 to-blue-100">
+        <div className="w-full max-w-md">
+          {/* Warning */}
+          <div className="flex items-center gap-2 mb-6 bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm p-3 rounded">
+            <ShieldAlert className="w-4 h-4" />
+            <span>
+              This is a prototype. No database or encryption — use throwaway
+              email if unsure.
+            </span>
+          </div>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button className="w-full" type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Me a Magic Link"
+                )}
+              </Button>
+              {message && (
+                <p className="text-sm text-center text-muted-foreground mt-2">
+                  {message}
+                </p>
+              )}
+            </form>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 }
