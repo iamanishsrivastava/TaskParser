@@ -48,26 +48,27 @@ export default function ParserDemoAuto() {
   return (
     <section
       id="demo"
-      className="min-h-200 py-8 bg-gradient-to-bl from-pink-100 via-purple-50 to-blue-100 px-6"
+      className="min-h-screen py-16 bg-gradient-to-bl from-pink-100 via-purple-50 to-blue-100 px-4 sm:px-6 md:px-8"
     >
       <div className="max-w-5xl mx-auto text-center mb-12">
         <h1 className="text-4xl font-extrabold mb-3 text-pink-900">
           Type Tasks Like a Human, Parsed by AI
         </h1>
-        <p className="text-pink-700 max-w-1xl mx-auto">
+        <p className="text-pink-700 max-w-2xl mx-auto">
           Watch how TaskParser transforms natural language into structured tasks
           seamlessly.
         </p>
       </div>
-      <div className="flex flex-col justify-center items-center w-5xl mx-auto space-y-10">
+
+      <div className="flex flex-col justify-center items-center space-y-10">
         {/* Typed Input */}
-        <Card className="p-6 w-200 shadow-lg border border-pink-200 bg-white/90">
-          <div className="flex justify-between items-center">
+        <Card className="w-full max-w-2xl p-6 shadow-lg border border-pink-200 bg-white/90">
+          <div className="flex justify-between items-center mb-3">
             <h2 className="text-xl font-semibold text-pink-900">
               Auto-Typing Input
             </h2>
             <div className="flex gap-3 items-center">
-              {/* Skip current example */}
+              {/* Skip */}
               <button
                 onClick={() => {
                   if (index < examples.length) {
@@ -88,7 +89,7 @@ export default function ParserDemoAuto() {
                 <FastForward className="w-5 h-5" />
               </button>
 
-              {/* Complete all remaining instantly */}
+              {/* Complete All */}
               <button
                 onClick={() => {
                   const remaining = examples.slice(index);
@@ -108,7 +109,7 @@ export default function ParserDemoAuto() {
                 <SkipForward className="w-5 h-5" />
               </button>
 
-              {/* Restart demo */}
+              {/* Restart */}
               <button
                 onClick={() => {
                   setTyped("");
@@ -121,7 +122,7 @@ export default function ParserDemoAuto() {
                 <RotateCcw className="w-5 h-5" />
               </button>
             </div>
-          </div>{" "}
+          </div>
           <Input
             value={typed}
             readOnly
@@ -129,20 +130,21 @@ export default function ParserDemoAuto() {
           />
         </Card>
 
-        {/* Parsed Tasks List */}
-        <div className="grid gap-6 w-300 sm:grid-cols-1 md:grid-cols-3">
+        {/* Parsed Tasks Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full max-w-7xl">
           {tasks.map((task, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.15 }}
+              className="flex flex-col space-y-4"
             >
-              <Card className="flex gap-2 p-4 border border-pink-300 shadow-sm bg-white">
+              <Card className="p-4 border border-pink-300 shadow-sm bg-white">
                 <h3 className="text-lg font-semibold text-pink-700 truncate">
                   {task.title || "—"}
                 </h3>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 mt-2">
                   <div>
                     <span className="font-medium text-gray-700">
                       Due Date:{" "}
@@ -162,13 +164,7 @@ export default function ParserDemoAuto() {
                     {task.priority ? (
                       <Badge
                         variant={
-                          task.priority === "high"
-                            ? "destructive"
-                            : task.priority === "medium"
-                            ? "secondary"
-                            : task.priority === "low"
-                            ? "secondary"
-                            : "default"
+                          task.priority === "high" ? "destructive" : "secondary"
                         }
                         className={
                           task.priority === "medium"
@@ -186,7 +182,8 @@ export default function ParserDemoAuto() {
                   </div>
                 </div>
               </Card>
-              <Card className="p-2 mt-4 bg-white/90 border border-pink-200 shadow-md rounded text-left font-mono text-sm text-pink-900 w-full">
+
+              <Card className="p-2 bg-white/90 border border-pink-200 shadow-md rounded text-left font-mono text-sm text-pink-900 w-full overflow-x-auto">
                 <div className="flex justify-between items-center p-2 border-b border-pink-100">
                   <span className="font-semibold">Parsed Output</span>
                   <button
@@ -206,7 +203,7 @@ export default function ParserDemoAuto() {
                     )}
                   </button>
                 </div>
-                <pre className="px  -2 whitespace-pre-wrap break-words">
+                <pre className="px-2 py-1 whitespace-pre-wrap break-words text-xs">
                   {JSON.stringify(task, null, 2)}
                 </pre>
               </Card>
