@@ -7,6 +7,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import { AppProvider } from "./context/AppProvider";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Docs from "./pages/Docs/Docs";
 
 function ScrollToHash() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/docs" element={<Docs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/magic-callback" element={<MagicCallback />} />
           <Route path="*" element={<Landing />} /> {/* fallback */}
