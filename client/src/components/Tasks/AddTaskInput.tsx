@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/context/TasksProvider";
 
+console.log("AddTaskInput loaded");
+
 export default function AddTaskInput({ projectId }: { projectId: string }) {
   const [input, setInput] = useState("");
   const { addTask } = useTasks();

@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import { Github } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import ParserShowcase from "@/components/Landing/ParserShowcase";
-import Navbar from "@/components/Landing/Navbar";
-import FloatingProblemBanner from "@/components/Landing/FloatingProblemBanner";
-import Features from "@/components/Landing/Features";
-import UnderTheHood from "@/components/Landing/UnderTheHood";
+import ParserShowcase from "../components/Landing/ParserShowcase";
+import Navbar from "../components/Landing/Navbar";
+import FloatingProblemBanner from "../components/Landing/FloatingProblemBanner";
+import Features from "../components/Landing/Features";
+import UnderTheHood from "../components/Landing/UnderTheHood";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

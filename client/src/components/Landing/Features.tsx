@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
-import { Card, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "../ui/card";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 import { Phone, Video, MoreVertical, Send } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "../ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "../ui/tooltip";
 
 const messages = [
   {
