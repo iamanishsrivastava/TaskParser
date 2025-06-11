@@ -6,22 +6,25 @@ import { Loader2 } from "lucide-react";
 export default function MagicCallback() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
+  console.log("Magic callback loaded");
   useEffect(() => {
     async function finishLogin() {
       try {
-        const search = new URLSearchParams(window.location.search);
-        const credential = search.get("magic_credential");
+        await magic.auth.loginWithCredential();
 
-        if (credential) {
-          await magic.auth.loginWithCredential(); // consume token
-          console.log("User session created");
-          navigate("/dashboard", { replace: true });
-        } else {
-          navigate("/login", { replace: true });
-        }
+        const didToken = await magic.user.getIdToken();
+        await fetch("/api/session", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${didToken}`,
+          },
+          credentials: "include",
+        });
+
+                console.log("User session created");
+        navigate("/dashboard", { replace: true });
       } catch (err) {
-        console.error("Login error", err);
+        console.error("Magic login error:", err);
         navigate("/login", { replace: true });
       } finally {
         setLoading(false);

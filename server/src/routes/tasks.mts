@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { Router } from "express";
 import crypto from "crypto";
-import { db } from "../utils/db.mjs";
+import { db } from "../utils/db.mts";
 
 const taskRouter: Router = Router();
 

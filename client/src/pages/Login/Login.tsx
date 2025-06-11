@@ -58,6 +58,7 @@ export default function Login() {
         email: cleanEmail,
         redirectURI: `${window.location.origin}/magic-callback`,
       });
+      console.log("Location", window.location.origin);
       setMessage("Magic link sent! Check your email.");
     } catch (err) {
       console.error("Magic login error:", err);

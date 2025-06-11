@@ -27,4 +27,4 @@ CREATE TABLE tasks (
   task_status TEXT CHECK (task_status IN ('todo', 'in-progress', 'done')) DEFAULT 'todo',
   task_priority TEXT CHECK (task_priority IN ('low', 'medium', 'high', 'urgent')) DEFAULT 'medium',
   description TEXT
-);
+);  
