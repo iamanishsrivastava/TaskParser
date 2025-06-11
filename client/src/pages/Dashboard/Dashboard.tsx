@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import magic from "@/lib/magic";
 import { Button } from "@/components/ui/button";
 import TaskList from "@/components/Tasks/TaskList";
@@ -21,29 +21,64 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     await magic.user.logout();
+
+    await fetch("/api/logout", { method: "POST", credentials: "include" });
+
     navigate("/login");
   };
 
   const activeProject = projects.find((p) => p.id === activeProjectId);
-  if (!activeProjectId && projects.length > 0) {
-    setActiveProjectId(projects[0].id);
-  }
 
-  const { tasks } = useTasks();
-  const tasksForProject = tasks.filter(
-    (task: { projectId: string | undefined }) =>
-      task.projectId === activeProject?.id
-  );
+  useEffect(() => {
+    if (!activeProjectId && projects.length > 0) {
+      setActiveProjectId(projects[0].id);
+    }
+  }, [projects, activeProjectId]);
 
-  console.log("Projects loaded in dashboard:", projects);
+  const { error } = useTasks();
+
+  // console.log("Projects loaded in dashboard:", projects);
+  // console.log("Tasks in Dashboard:", tasks);
+  // console.log("Filtered Tasks:", tasksForProject);
+  // console.log("Project ID:", activeProject?.id);
+  // console.log("Task projectIds:", tasks.map((t) => t.projectId));
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Loading...
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center p-4 space-y-4">
+        <p className="text-lg font-medium text-red-600">
+          Failed to load tasks.{" "}
+          {typeof error === "object" && error !== null && "message" in error
+            ? (error as { message: string }).message
+            : typeof error === "string"
+            ? error
+            : "Please login again."}
+        </p>
+        <Button
+          variant="outline"
+          onClick={async () => {
+            await magic.user.logout();
+            await fetch("/api/logout", {
+              method: "POST",
+              credentials: "include",
+            });
+            navigate("/login");
+          }}
+        >
+          Logout & Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -70,13 +105,13 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <ProjectNameInline
                       name={project.title}
-                      projectId={project.id}
+                      project_id={project.id}
                       updateProject={updateProject}
                     />
                   </div>
                   <DeleteProjectInline
-                    projectName={project.title}
-                    projectId={project.id}
+                    project_name={project.title}
+                    project_id={project.id}
                   />
                 </div>
               </div>
@@ -110,8 +145,8 @@ export default function Dashboard() {
             </div>
           ) : activeProject ? (
             <>
-              <AddTaskInput projectId={activeProject.id} />
-              <TaskList project={activeProject} tasks={tasksForProject} />
+              <AddTaskInput project_id={activeProject.id} />
+              <TaskList project={activeProject} />
             </>
           ) : (
             <div className="text-center text-muted-foreground">

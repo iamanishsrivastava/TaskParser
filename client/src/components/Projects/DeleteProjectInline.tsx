@@ -12,18 +12,18 @@ import { useState } from "react";
 import { useProjects } from "@/context/ProjectsProvider";
 
 export function DeleteProjectInline({
-  projectId,
-  projectName,
+  project_id,
+  project_name,
 }: {
-  projectId: string;
-  projectName: string;
+  project_id: string;
+  project_name: string;
 }) {
   const { removeProject } = useProjects();
   const [input, setInput] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleDelete = () => {
-    removeProject(projectId);
+    removeProject(project_id);
     setOpen(false);
     setInput("");
   };
@@ -38,11 +38,11 @@ export function DeleteProjectInline({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Are you certain you want to delete "{projectName}"?
+            Are you certain you want to delete "{project_name}"?
           </DialogTitle>
           <p className="text-sm text-muted-foreground mt-2">
             This will permanently delete this project. Type{" "}
-            <strong className="text-red-500">{projectName}</strong> to confirm.
+            <strong className="text-red-500">{project_name}</strong> to confirm.
           </p>
         </DialogHeader>
         <input
@@ -58,7 +58,7 @@ export function DeleteProjectInline({
           <Button
             variant="destructive"
             disabled={
-              input.trim().toLowerCase() !== (projectName?.toLowerCase() ?? "")
+              input.trim().toLowerCase() !== (project_name?.toLowerCase() ?? "")
             }
             onClick={handleDelete}
           >

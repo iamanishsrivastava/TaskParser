@@ -2,11 +2,11 @@ import { useState } from "react";
 
 export default function ProjectNameInline({
   name,
-  projectId,
+  project_id,
   updateProject,
 }: {
   name: string;
-  projectId: string;
+  project_id: string;
   updateProject: (id: string, newName: string) => Promise<void>;
 }) {
   const [editing, setEditing] = useState(false);
@@ -15,7 +15,7 @@ export default function ProjectNameInline({
   const handleBlur = async () => {
     setEditing(false);
     if (value.trim() && value !== name) {
-      await updateProject(projectId, value.trim());
+      await updateProject(project_id, value.trim());
     }
   };
 

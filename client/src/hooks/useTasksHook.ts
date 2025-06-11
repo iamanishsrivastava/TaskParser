@@ -1,30 +1,48 @@
-// hooks/useTasksHook.ts
+// src/hooks/useTasksHook.ts
+
 import { useState, useEffect } from "react";
-import { nanoid } from "nanoid";
 import type { Task } from "@/types/models";
 import { parseTask } from "@/services/parser/parseTask";
+import { useAuthFetch } from "./useAuthFetch";
 
 export const useTasksHook = () => {
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const stored = localStorage.getItem("tasks");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { authFetch } = useAuthFetch();
 
   useEffect(() => {
-    fetch(`/api/tasks`)
-      .then((res) => res.json())
-      .then(setTasks)
-      .catch(console.error);
+    const fetchTasks = async () => {
+      try {
+        setLoading(true);
+        const res = await authFetch("/api/tasks");
+
+        if (!res.ok) throw new Error("Unauthorized or API failed");
+
+        const data = await res.json();
+        setTasks(data);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        console.error("Fetching tasks failed:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
   }, []);
 
-  async function addTask(partialTask: { title: string; projectId: string }) {
+  const addTask = async (partialTask: {
+    title: string;
+    project_id: string;
+  }) => {
     const parsed = parseTask(partialTask.title);
     const newTaskPayload = {
-      id: nanoid(),
       title: parsed.title || partialTask.title,
-      projectId: partialTask.projectId,
+      project_id: partialTask.project_id,
       completed: false,
-      createdAt: new Date().toISOString(),
       due_date: parsed.dueDate || null,
       task_label: "Feature",
       task_status: "todo",
@@ -32,40 +50,55 @@ export const useTasksHook = () => {
       description: "",
     };
 
-    const res = await fetch(`/api/tasks`, {
+    console.log("Payload being sent:", newTaskPayload);
+
+    const res = await authFetch("/api/tasks", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(newTaskPayload),
     });
 
-    if (!res.ok) throw new Error("Failed to add task");
+    // DEBUG
+    // await authFetch("/api/debug-task", {
+    //   method: "POST",
+    //   body: JSON.stringify({ title: "Test", projectId: "abc" }),
+    // });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Failed to add task", errorText);
+      throw new Error("Failed to add task");
+    }
+
     const newTask = await res.json();
     setTasks((prev) => [...prev, newTask]);
-  }
+  };
 
   const removeTask = async (id: string) => {
-    const res = await fetch(`/api/tasks/${id}`, {
+    const res = await authFetch(`/api/tasks/${id}`, {
       method: "DELETE",
     });
     if (res.ok) {
       setTasks((prev) => prev.filter((task) => task.id !== id));
+    } else {
+      const errorText = await res.text();
+      console.error("Failed to delete task", errorText);
     }
   };
 
   const updateTask = async (id: string, updatedFields: Partial<Task>) => {
-    const res = await fetch(`/api/tasks/${id}`, {
+    const res = await authFetch(`/api/tasks/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedFields),
     });
-    console.error("Update failed:", await res.text());
-    if (!res.ok) throw new Error("Failed to update task");
-    const updatedTask = await res.json();
 
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Failed to update task", errorText);
+      throw new Error("Failed to update task");
+    }
+
+    const updatedTask = await res.json();
     setTasks((prev) =>
       prev.map((task) => (task.id === id ? updatedTask : task))
     );
@@ -73,6 +106,8 @@ export const useTasksHook = () => {
 
   return {
     tasks,
+    loading,
+    error,
     addTask,
     removeTask,
     updateTask,
