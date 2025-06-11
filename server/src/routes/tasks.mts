@@ -1,33 +1,14 @@
 import type { RequestHandler } from "express";
-import { Router } from "express";
+import express, { Router } from "express";
 import crypto from "crypto";
 import { db } from "../utils/db.mts";
-
+import { validate } from "../middlewares/validate.ts";
+import { createTaskSchema } from "../validators/task.ts";
+import type { Task } from "../types/model.ts";
 const taskRouter: Router = Router();
 
-interface Task {
-  id: string;
-  title: string;
-  projectId: string;
-  completed: boolean;
-  createdAt: string;
-  due_date: string | null;
-  task_label: string;
-  task_status: string;
-  task_priority: string;
-  description: string;
-}
-
-const allowedFields = [
-  "title",
-  "completed",
-  "due_date",
-  "task_label",
-  "task_status",
-  "task_priority",
-  "description",
-  "project_id",
-];
+taskRouter.use(express.json());
+console.log("Tasks router loaded");
 
 // GET all tasks for the logged-in user
 taskRouter.get("/", async (req, res) => {
@@ -35,7 +16,8 @@ taskRouter.get("/", async (req, res) => {
     const result = await db.query("SELECT * FROM tasks WHERE user_id = $1", [
       req.user!.id,
     ]);
-    res.json(result.rows);
+    const tasks = result.rows;
+    res.json(tasks);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch tasks" });
@@ -43,11 +25,12 @@ taskRouter.get("/", async (req, res) => {
 });
 
 // POST new task
-taskRouter.post("/", async (req, res) => {
+taskRouter.post("/", validate(createTaskSchema), async (req, res) => {
+  console.log("Received Payload:", req.body);
   try {
     const {
       title,
-      projectId,
+      project_id,
       completed = false,
       due_date = null,
       task_label = "",
@@ -57,7 +40,7 @@ taskRouter.post("/", async (req, res) => {
     } = req.body;
 
     const id = crypto.randomUUID();
-    const createdAt = new Date().toISOString();
+    const created_at = new Date().toISOString();
     const userId = req.user!.id;
 
     const query = `
@@ -70,9 +53,9 @@ taskRouter.post("/", async (req, res) => {
     const values = [
       id,
       title,
-      projectId,
+      project_id,
       completed,
-      createdAt,
+      created_at,
       due_date,
       task_label,
       task_status,
@@ -81,11 +64,17 @@ taskRouter.post("/", async (req, res) => {
       userId,
     ];
 
+    console.log("Final Insert Payload:", {
+      ...req.body,
+      id,
+      created_at,
+      userId,
+    });
     const result = await db.query(query, values);
     res.status(201).json(result.rows[0]);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to create task" });
+    console.log(err);
   }
 });
 
@@ -112,8 +101,6 @@ const updateTask: RequestHandler<{ id: string }> = async (req, res) => {
       RETURNING *;
     `;
 
-    values.push(req.user!.id);
-
     const result = await db.query(query, values);
 
     if (result.rowCount === 0) {
@@ -123,8 +110,8 @@ const updateTask: RequestHandler<{ id: string }> = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to update task" });
+    console.log(err);
   }
 };
 
@@ -143,7 +130,7 @@ const deleteTask: RequestHandler<{ id: string }> = async (req, res) => {
 
     res.status(204).send();
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({ error: "Failed to delete task" });
   }
 };

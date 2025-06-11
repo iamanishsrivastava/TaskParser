@@ -2,26 +2,26 @@ export interface User {
   id: string;
   email?: string;
   name?: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Project {
   id: string;
-  userId: string;
+  user_id: string;
   title: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Task {
   id: string;
-  projectId: string;
-  userId: string;
+  project_id: string;
+  user_id: string;
   title: string;
   completed: boolean;
-  createdAt: string;
-  dueDate?: string | null;
-  taskLabel?: string;
-  taskStatus?: "todo" | "in-progress" | "done";
-  taskPriority?: "low" | "medium" | "high" | "urgent";
+  created_at: string;
+  due_date?: string | null;
+  task_label?: string;
+  task_status?: "todo" | "in-progress" | "done";
+  task_priority?: "low" | "medium" | "high" | "urgent";
   description?: string;
 }
