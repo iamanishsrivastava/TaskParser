@@ -2,20 +2,27 @@
   "type": "module",
   "scripts": {
     "start": "ts-node-esm src/index.mts",
-    "dev": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--trace-uncaught --trace-warnings' nodemon --watch './' --ext mts --exec \"node --loader ts-node/esm\" src/index.mts"
+    "dev": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--trace-uncaught --trace-warnings' nodemon --watch './' --ext mts --exec \"node --loader ts-node/esm\" src/index.mts",
+    "apply:schema": "ts-node-esm src/tools/applySchema.mts"
   },
   "dependencies": {
     "@magic-sdk/admin": "^2.4.1",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
     "@types/pg": "^8.15.4",
     "body-parser": "^2.2.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "pg": "^8.16.0"
+    "pg": "^8.16.0",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/express": "^5.0.2",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^22.15.29",
     "cors": "^2.8.5",
+    "morgan": "^1.10.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

@@ -1,6 +1,6 @@
-// middleware/magicAuth.ts
+// src/middlewares/magicAuth.ts
 import type { Request, Response, NextFunction } from "express";
-import { magic } from "../utils/magic.ts";
+import { magic } from "../utils/magic";
 import { db } from "../utils/db.mts";
 
 export const magicAuthMiddleware = async (
@@ -8,20 +8,29 @@ export const magicAuthMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res
-      .status(401)
-      .json({ error: "Missing or malformed authorization header" });
+  // Support both: Bearer token from header OR session from cookie
+  const headerToken = req.headers.authorization?.split("Bearer ")[1];
+  const cookieToken = req.cookies.session;
+  const token = headerToken || cookieToken;
+
+  // console.log("Middleware received token:", token);
+
+  if (!token) {
+    console.log("Middleware: Missing token");
+    res.status(401).json({ error: "Missing token" });
+    return;
   }
-  const token = authHeader.split("Bearer ")[1];
-  if (!token) return res.status(401).json({ error: "Missing token" });
 
   try {
     const metadata = await magic.users.getMetadataByToken(token);
-    if (!metadata.issuer)
-      return res.status(401).json({ error: "Invalid token" });
 
+    if (!metadata?.issuer) {
+      console.log("Middleware: Invalid token (no issuer)");
+      res.status(401).json({ error: "Invalid token" });
+      return;
+    }
+
+    // Attach user to request
     req.user = {
       id: metadata.issuer,
       issuer: metadata.issuer,
@@ -29,7 +38,7 @@ export const magicAuthMiddleware = async (
       publicAddress: metadata.publicAddress,
     };
 
-    // Auto-create user in DB if not exists
+    // Auto-create user if not exists
     await db.query(
       `INSERT INTO users (id, email) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING`,
       [metadata.issuer, metadata.email]
@@ -37,7 +46,7 @@ export const magicAuthMiddleware = async (
 
     next();
   } catch (err) {
-    console.error("Auth error:", err);
+    console.error("Middleware Auth error:", err);
     res.status(401).json({ error: "Unauthorized" });
   }
 };
