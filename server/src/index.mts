@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import taskRouter from "./routes/tasks.mts";
 import projectRouter from "./routes/projects.mts";
+import parseRouter from "./routes/parse.mts";
 import { magicAuthMiddleware } from "./middlewares/magicAuth";
 import { db } from "./utils/db.mts";
 import { magic } from "./utils/magic";
@@ -65,6 +66,8 @@ app.post("/api/session", async (req, res) => {
 
 // Auth middleware applied here
 // app.use("/api", magicAuthMiddleware);
+
+app.use("/api/parse", magicAuthMiddleware, parseRouter);
 
 // Auth-protected routes
 app.use("/api/tasks", magicAuthMiddleware, taskRouter);
