@@ -5,6 +5,7 @@ import { db } from "../utils/db.mts";
 import { validate } from "../middlewares/validate.ts";
 import { createTaskSchema } from "../validators/task.ts";
 import type { Task } from "../types/model.ts";
+import { ragParseTask } from "../services/ragParseTask.mts";
 const taskRouter: Router = Router();
 
 taskRouter.use(express.json());
@@ -39,6 +40,9 @@ taskRouter.post("/", validate(createTaskSchema), async (req, res) => {
       description = "",
     } = req.body;
 
+    const parsed = await ragParseTask(title);
+    console.log("Parsed Task:", parsed);
+
     const id = crypto.randomUUID();
     const created_at = new Date().toISOString();
     const userId = req.user!.id;
@@ -52,14 +56,14 @@ taskRouter.post("/", validate(createTaskSchema), async (req, res) => {
 
     const values = [
       id,
-      title,
+      parsed.title || title,
       project_id,
       completed,
       created_at,
-      due_date,
+      parsed.due_date || due_date,
       task_label,
       task_status,
-      task_priority,
+      parsed.task_priority || task_priority,
       description,
       userId,
     ];
