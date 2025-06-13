@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import type { Task } from "@/types/models";
-import { parseTask } from "@/services/parser/parseTask";
 import { useAuthFetch } from "./useAuthFetch";
 
 export const useTasksHook = () => {
@@ -38,16 +37,10 @@ export const useTasksHook = () => {
     title: string;
     project_id: string;
   }) => {
-    const parsed = parseTask(partialTask.title);
+    //TODO: Add userId to the payload
     const newTaskPayload = {
-      title: parsed.title || partialTask.title,
+      title: partialTask.title,
       project_id: partialTask.project_id,
-      completed: false,
-      due_date: parsed.dueDate || null,
-      task_label: "Feature",
-      task_status: "todo",
-      task_priority: parsed.priority || "medium",
-      description: "",
     };
 
     console.log("Payload being sent:", newTaskPayload);
