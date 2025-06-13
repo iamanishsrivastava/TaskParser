@@ -10,8 +10,6 @@ import cors from "cors";
 const app = express();
 const PORT = 4000;
 
-// FIXME: TypeError: Cannot destructure property 'title' of 'req.body' as it is undefined.
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 console.log("JSON Middleware loaded");
