@@ -28,5 +28,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "setup-test.ts", "src/tests/__mocks__"]
+  "include": [
+    "src",
+    "setup-test.ts",
+    "src/tests/__mocks__",
+    "../server/src/utils/extractDate.mts",
+    "../server/src/utils/extractPriority.mts"
+  ]
 }

@@ -1,26 +1,18 @@
+// src/utils/extractPriority.mts
 const priorityWords: Record<"low" | "medium" | "high", string[]> = {
   low: ["low", "not urgent", "minor"],
   medium: ["medium", "normal", "moderate"],
   high: ["high", "urgent", "asap", "critical"],
 };
 
-export function extractPriority(input: string): {
-  level: "low" | "medium" | "high" | null;
-  phrase: string | null;
-} {
-  if (!input || typeof input !== "string") {
-    return { level: null, phrase: null };
-  }
+export function extractPriority(input: string) {
   const lower = input.toLowerCase();
-
-  for (const level of Object.keys(priorityWords) as Array<
-    "low" | "medium" | "high"
+  for (const priority of Object.keys(priorityWords) as Array<
+    keyof typeof priorityWords
   >) {
-    for (const word of priorityWords[level]) {
-      if (lower.includes(word)) {
-        return { level, phrase: word };
-      }
+    for (const word of priorityWords[priority]) {
+      if (lower.includes(word)) return { priority, phrase: word };
     }
   }
-  return { level: null, phrase: null };
+  return { priority: null, phrase: null };
 }

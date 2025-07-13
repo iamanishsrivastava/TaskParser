@@ -1,3 +1,4 @@
+// src/utils/extractDate.mts
 import {
   parse,
   isValid,
@@ -9,6 +10,7 @@ import {
 } from "date-fns";
 
 const dateKeywords: Record<string, () => Date> = {
+  yesterday: () => addDays(new Date(), -1),
   today: () => new Date(),
   tomorrow: () => addDays(new Date(), 1),
   tonight: () => setHours(new Date(), 21),
@@ -35,7 +37,7 @@ export function extractDate(input: string): {
     }
   }
 
-  const isoMatch = input.match(/\d{4}-\d{2}-\d{2}/); // <-- this line also needs a guarded input
+  const isoMatch = input.match(/\d{4}-\d{2}-\d{2}/);
 
   if (isoMatch) {
     const date = parse(isoMatch[0], "yyyy-MM-dd", new Date());

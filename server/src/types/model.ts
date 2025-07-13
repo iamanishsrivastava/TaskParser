@@ -25,3 +25,11 @@ export interface Task {
   task_priority?: "low" | "medium" | "high" | "urgent";
   description?: string;
 }
+
+export interface TaskPattern {
+  id: number;
+  pattern: string;
+  default_due_time: string;
+  default_priority: "low" | "medium" | "high" | "urgent";
+}
+

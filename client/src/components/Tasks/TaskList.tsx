@@ -7,7 +7,6 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -18,19 +17,41 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Loader2, Trash2 } from "lucide-react";
 import type { Project } from "@/types/models";
-import { format } from "date-fns";
-import { TaskActions } from "./TaskActions";
+import { format, setMinutes, setHours } from "date-fns";
 import { useTasks } from "@/context/TasksProvider";
 import { useEffect } from "react";
+import { EditableText } from "../EditableText";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+// import type { Task } from "@/types/models";
 
 export default function TaskList({ project }: { project: Project }) {
-  const { tasks, removeTask } = useTasks();
+  const {
+    tasks,
+    removeTask,
+    updateTaskTitle,
+    updateTaskDueDate,
+    updateTaskLabel,
+    updateTaskPriority,
+    updateTaskStatus,
+  } = useTasks();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  
   const toggleSelection = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -140,49 +161,133 @@ export default function TaskList({ project }: { project: Project }) {
         <TableHeader>
           <TableRow>
             <TableHead></TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Priority</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead className="w-20 text-left">Actions</TableHead>
+            <TableHead className="w-70 border-x">Title</TableHead>
+            <TableHead className="w-32 border-r">Label</TableHead>
+            <TableHead className="w-30 border-r">Status</TableHead>
+            <TableHead className="w-30 border-r">Priority</TableHead>
+            <TableHead className="w-30 border-r">Due Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {projectTasks.map((task) => (
             <TableRow key={task.id}>
-              <TableCell className="w-8 text-center">
+              <TableCell className="w-8 text-center border-r">
                 <Checkbox
                   checked={selectedIds.includes(task.id)}
                   onCheckedChange={() => toggleSelection(task.id)}
                 />
               </TableCell>
-              <TableCell className="font-medium w-100">
-                {task.title}
-                <Badge variant="secondary" className="mx-4 bg-blue-100 text-xs">
-                  {task.task_label}
-                </Badge>
+
+              <TableCell className="font-medium w-70 gap-2 border-r">
+                <EditableText
+                  value={task.title}
+                  onSave={(val) => updateTaskTitle(task.id, val)}
+                />
               </TableCell>
-              <TableCell className="w-32">
-                <Badge variant="outline">{task.task_status}</Badge>
+              <TableCell className="w-32 border-r">
+                <EditableText
+                  value={task.task_label || "Not Specified"}
+                  onSave={(val) => updateTaskLabel(task.id, val)}
+                />
               </TableCell>
-              <TableCell className="w-32">
-                <Badge
-                  variant={
-                    task.task_priority === "urgent"
-                      ? "destructive"
-                      : "secondary"
-                  }
-                >
-                  {task.task_priority}
-                </Badge>
+
+              <TableCell className="border-r">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-center w-full">
+                      {task.task_status === "todo" && "To Do"}
+                      {task.task_status === "in-progress" && "In Progress"}
+                      {task.task_status === "done" && "Done"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="text-center w-full">
+                    <DropdownMenuItem
+                      onClick={() => updateTaskStatus(task.id, "todo")}
+                    >
+                      To Do
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTaskStatus(task.id, "in-progress")}
+                    >
+                      In Progress
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTaskStatus(task.id, "done")}
+                    >
+                      Done
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
-              <TableCell className="w-32">
-                {task.due_date
-                  ? format(new Date(task.due_date), "PPP")
-                  : "No due date"}
+              <TableCell className="border-r">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant={
+                        task.task_priority === "urgent"
+                          ? "destructive"
+                          : "ghost"
+                      }
+                      className="text-center w-full"
+                    >
+                      {task.task_priority === "low" && "Low"}
+                      {task.task_priority === "medium" && "Medium"}
+                      {task.task_priority === "high" && "High"}
+                      {task.task_priority === "urgent" && "Urgent"}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="text-center w-full">
+                    <DropdownMenuItem
+                      onClick={() => updateTaskPriority(task.id, "low")}
+                    >
+                      Low
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTaskPriority(task.id, "medium")}
+                    >
+                      Medium
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTaskPriority(task.id, "high")}
+                    >
+                      High
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => updateTaskPriority(task.id, "urgent")}
+                    >
+                      Urgent
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
-              <TableCell className="w-20 flex justify-end items-center">
-                <TaskActions task={{ id: task.id, title: task.title }} />
+              {/* // "low" | "medium" | "high" | "urgent"; */}
+              <TableCell className="w-32 border-r">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-left px-2"
+                    >
+                      {task.due_date
+                        ? format(new Date(task.due_date), "PPP")
+                        : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        task.due_date ? new Date(task.due_date) : undefined
+                      }
+                      onSelect={(date) => {
+                        if (date) {
+                          const fixed = setMinutes(setHours(date, 12), 0);
+                          updateTaskDueDate(task.id, fixed.toISOString());
+                        }
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
               </TableCell>
             </TableRow>
           ))}

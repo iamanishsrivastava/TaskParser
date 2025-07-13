@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { parseTask } from "@/services/parser/parseTask";
+import { fetchParseTask } from "@/lib/fetchParseTask";
+import type { ParsedTask } from "@/types/ParsedTask";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -12,12 +13,10 @@ const examples = [
   "Prepare slides next week, medium priority",
 ];
 
-type Parsed = ReturnType<typeof parseTask>;
-
 export default function ParserDemoAuto() {
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState("");
-  const [tasks, setTasks] = useState<Parsed[]>([]);
+  const [tasks, setTasks] = useState<ParsedTask[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -34,8 +33,8 @@ export default function ParserDemoAuto() {
         char++;
       } else {
         clearInterval(interval);
-        setTimeout(() => {
-          const parsed = parseTask(current);
+        setTimeout(async () => {
+          const parsed = await fetchParseTask(current);
           setTasks((prev) => [...prev, parsed]);
           setIndex((prev) => prev + 1);
         }, 600);
@@ -70,9 +69,9 @@ export default function ParserDemoAuto() {
             <div className="flex gap-3 items-center">
               {/* Skip */}
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (index < examples.length) {
-                    const parsed = parseTask(examples[index]);
+                    const parsed = await fetchParseTask(examples[index]);
                     setTyped(examples[index]);
                     setTasks((prev) => [...prev, parsed]);
                     setIndex((prev) => prev + 1);
@@ -91,9 +90,11 @@ export default function ParserDemoAuto() {
 
               {/* Complete All */}
               <button
-                onClick={() => {
+                onClick={async () => {
                   const remaining = examples.slice(index);
-                  const parsedAll = remaining.map((e) => parseTask(e));
+                  const parsedAll = await Promise.all(
+                    remaining.map((e) => fetchParseTask(e))
+                  );
                   setTyped(remaining[remaining.length - 1] || "");
                   setTasks((prev) => [...prev, ...parsedAll]);
                   setIndex(examples.length);
@@ -149,9 +150,9 @@ export default function ParserDemoAuto() {
                     <span className="font-medium text-gray-700">
                       Due Date:{" "}
                     </span>
-                    {task.dueDate ? (
+                    {task.due_date ? (
                       <Badge variant="secondary">
-                        {new Date(task.dueDate).toLocaleString()}
+                        {new Date(task.due_date).toLocaleString()}
                       </Badge>
                     ) : (
                       <span className="text-gray-400">None</span>
@@ -161,20 +162,22 @@ export default function ParserDemoAuto() {
                     <span className="font-medium text-gray-700">
                       Priority:{" "}
                     </span>
-                    {task.priority ? (
+                    {task.task_priority ? (
                       <Badge
                         variant={
-                          task.priority === "high" ? "destructive" : "secondary"
+                          task.task_priority === "high"
+                            ? "destructive"
+                            : "secondary"
                         }
                         className={
-                          task.priority === "medium"
+                          task.task_priority === "medium"
                             ? "bg-yellow-200 text-yellow-800"
-                            : task.priority === "low"
+                            : task.task_priority === "low"
                             ? "bg-green-200 text-green-800"
                             : ""
                         }
                       >
-                        {task.priority}
+                        {task.task_priority}
                       </Badge>
                     ) : (
                       <span className="text-gray-400">Not detected</span>

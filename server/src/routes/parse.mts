@@ -1,6 +1,6 @@
 import express, { Router } from "express";
-import { ragParseTask } from "../services/ragParseTask.mts";
-
+import { ragParseTask } from "../services/rag/ragParseTask.mts";
+import { parseTask } from "../services/parseTask.mts";
 const parseRouter: Router = Router();
 
 parseRouter.use(express.json());

@@ -97,6 +97,23 @@ export const useTasksHook = () => {
     );
   };
 
+  const updateTaskTitle = (id: string, title: string) =>
+    updateTask(id, { title });
+
+  const updateTaskPriority = (
+    id: string,
+    task_priority: Task["task_priority"]
+  ) => updateTask(id, { task_priority });
+
+  const updateTaskDueDate = (id: string, due_date: string | null) =>
+    updateTask(id, { due_date });
+
+  const updateTaskStatus = (id: string, status: Task["task_status"]) =>
+    updateTask(id, { task_status: status });
+
+  const updateTaskLabel = (id: string, label: Task["task_label"]) =>
+    updateTask(id, { task_label:label });
+
   return {
     tasks,
     loading,
@@ -104,5 +121,10 @@ export const useTasksHook = () => {
     addTask,
     removeTask,
     updateTask,
+    updateTaskTitle,
+    updateTaskPriority,
+    updateTaskDueDate,
+    updateTaskStatus,
+    updateTaskLabel,
   };
 };

@@ -4,8 +4,8 @@ import crypto from "crypto";
 import { db } from "../utils/db.mts";
 import { validate } from "../middlewares/validate.ts";
 import { createTaskSchema } from "../validators/task.ts";
-import type { Task } from "../types/model.ts";
-import { ragParseTask } from "../services/ragParseTask.mts";
+import { smartParseTask } from "../services/smartParseTask.mts";
+
 const taskRouter: Router = Router();
 
 taskRouter.use(express.json());
@@ -40,7 +40,7 @@ taskRouter.post("/", validate(createTaskSchema), async (req, res) => {
       description = "",
     } = req.body;
 
-    const parsed = await ragParseTask(title);
+    const parsed = await smartParseTask(title);
     console.log("Parsed Task:", parsed);
 
     const id = crypto.randomUUID();
