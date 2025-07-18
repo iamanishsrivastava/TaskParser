@@ -3,6 +3,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://taskparser.onrender.com/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "buildCommand": "pnpm install && pnpm run build",
