@@ -15,7 +15,7 @@ export async function parseTask(input: string): Promise<ParsedTask> {
 
   const doc = nlp(input);
   const verbs = doc.verbs().out("text");
-  const adjectives = doc.adjectives().out("text");
+  // const adjectives = doc.adjectives().out("text");
   const nouns = doc.nouns().out("text");
 
   const title = verbs + " " + nouns || input;
