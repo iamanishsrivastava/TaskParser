@@ -1,5 +1,10 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://taskparser.onrender.com/api/$1"
+    }
+  ],
   "buildCommand": "pnpm install && pnpm run build",
   "outputDirectory": "dist"
 }
